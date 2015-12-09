@@ -17,8 +17,6 @@ def get_sevpasswd():
         PASSWORD = file.readline()
     finally:
         file.close()
-        print PASSWORD
-        print 'HHH'
         return PASSWORD
 
 def init_log():
@@ -63,11 +61,13 @@ def get_latest_code(git_path):
     else:
         perform_cmd(['git', 'clone', git_path, './pem_base'])
 
-#    if os.path.exists('pem'):
-#        perform_cmd(['rm', './pem', '-rf'])
+    if os.path.exists('pem'):
+        perform_cmd(['rm', 'pem', '-rf'])
 
     perform_cmd(['cp', 'pem_base', 'pem', '-rf'])
-    perform_cmd(['rm', './pem/.git', '-rf'])
+    perform_cmd(['rm', 'pem/.git', '-rf'])
+    perform_cmd(['rm', 'pem/.env', '-rf'])
+    perform_cmd(['mv', 'pem/.env_server', 'pem/.env'])
 
     print 'compress code'
     perform_cmd(['tar', 'czf', 'pem.tar.gz', './pem'])
@@ -110,7 +110,7 @@ def update_server_code():
     perform_cmd(['scp', 'pem.tar.gz', path])
 
     global PASSWORD
-    ssh_cmd(PASSWORD, 'cd /var/www && tar xzf pem_bak.tar.gz')
+    ssh_cmd(PASSWORD, 'cd /var/www && rm pem -rf && tar xzf pem.tar.gz && chown root:root pem -R && chmod 777 pem -R')
     logging('deploy code successfully')
     return
    
